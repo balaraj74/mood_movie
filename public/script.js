@@ -363,14 +363,18 @@ async function displayResults(moods, movieData) {
 
 // Load Movie Poster
 async function loadMoviePoster(movieTitle, year) {
+  const posterContainer = document.getElementById('moviePoster');
   const posterImage = document.getElementById('posterImage');
-  const posterLoader = document.querySelector('.poster-loader');
-  const posterFallback = document.querySelector('.poster-fallback');
+  const posterLoader = posterContainer.querySelector('.poster-loader');
+  const posterFallback = posterContainer.querySelector('.poster-fallback');
   
-  // Show loader
+  // Reset and show loader
+  posterImage.src = '';
   posterLoader.classList.remove('hidden');
   posterImage.classList.add('hidden');
-  posterFallback.style.opacity = '0.3';
+  if (posterFallback) {
+    posterFallback.style.opacity = '0.3';
+  }
   
   try {
     const response = await apiCall(`/movie-poster?movieTitle=${encodeURIComponent(movieTitle)}&year=${encodeURIComponent(year || '')}`);
@@ -383,26 +387,35 @@ async function loadMoviePoster(movieTitle, year) {
         posterImage.alt = `${movieTitle} Poster`;
         posterImage.classList.remove('hidden');
         posterLoader.classList.add('hidden');
-        posterFallback.style.opacity = '0';
+        if (posterFallback) {
+          posterFallback.style.opacity = '0';
+        }
       };
       img.onerror = () => {
         // Image failed to load, show fallback
         posterLoader.classList.add('hidden');
-        posterFallback.style.opacity = '1';
+        posterImage.classList.add('hidden');
+        if (posterFallback) {
+          posterFallback.style.opacity = '1';
+        }
       };
       img.src = response.posterUrl;
     } else {
       // No poster available, show fallback
       posterLoader.classList.add('hidden');
       posterImage.classList.add('hidden');
-      posterFallback.style.opacity = '1';
+      if (posterFallback) {
+        posterFallback.style.opacity = '1';
+      }
     }
   } catch (error) {
     console.error('Poster loading error:', error);
     // On error, show fallback
     posterLoader.classList.add('hidden');
     posterImage.classList.add('hidden');
-    posterFallback.style.opacity = '1';
+    if (posterFallback) {
+      posterFallback.style.opacity = '1';
+    }
   }
 }
 
