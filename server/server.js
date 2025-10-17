@@ -202,6 +202,49 @@ app.get('/api/youtube-trailer', authenticateUser, async (req, res) => {
   }
 });
 
+// Get movie poster from TMDB
+app.get('/api/movie-poster', authenticateUser, async (req, res) => {
+  try {
+    const { movieTitle, year } = req.query;
+    
+    if (!movieTitle) {
+      return res.status(400).json({ error: 'Movie title is required' });
+    }
+
+    const tmdbApiKey = process.env.TMDB_API_KEY;
+    
+    if (!tmdbApiKey) {
+      console.warn('TMDB_API_KEY not configured');
+      return res.json({ posterUrl: null });
+    }
+
+    // Search for the movie
+    const searchQuery = year ? `${movieTitle} ${year}` : movieTitle;
+    const searchUrl = `https://api.themoviedb.org/3/search/movie?api_key=${tmdbApiKey}&query=${encodeURIComponent(searchQuery)}`;
+    
+    const response = await fetch(searchUrl);
+    const data = await response.json();
+    
+    if (data.results && data.results.length > 0) {
+      const movie = data.results[0];
+      const posterPath = movie.poster_path;
+      
+      if (posterPath) {
+        // TMDB poster URLs: https://image.tmdb.org/t/p/{size}/{posterPath}
+        // Sizes: w92, w154, w185, w342, w500, w780, original
+        const posterUrl = `https://image.tmdb.org/t/p/w342${posterPath}`;
+        return res.json({ posterUrl, title: movie.title });
+      }
+    }
+    
+    // No poster found
+    res.json({ posterUrl: null });
+  } catch (error) {
+    console.error('TMDB API error:', error);
+    res.json({ posterUrl: null }); // Graceful fallback
+  }
+});
+
 // Save to history endpoint
 app.post('/api/save-history', authenticateUser, async (req, res) => {
   try {
