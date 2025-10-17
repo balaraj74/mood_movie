@@ -339,6 +339,9 @@ async function displayResults(moods, movieData) {
   document.getElementById('movieDesc').textContent = movieData.description;
   document.getElementById('movieWhy').textContent = movieData.reason;
   
+  // Load and display movie poster
+  await loadMoviePoster(movieData.title, movieData.year);
+  
   // Show result section
   document.getElementById('result').classList.remove('hidden');
   
@@ -356,6 +359,51 @@ async function displayResults(moods, movieData) {
   }
   
   setupMoodChart();
+}
+
+// Load Movie Poster
+async function loadMoviePoster(movieTitle, year) {
+  const posterImage = document.getElementById('posterImage');
+  const posterLoader = document.querySelector('.poster-loader');
+  const posterFallback = document.querySelector('.poster-fallback');
+  
+  // Show loader
+  posterLoader.classList.remove('hidden');
+  posterImage.classList.add('hidden');
+  posterFallback.style.opacity = '0.3';
+  
+  try {
+    const response = await apiCall(`/movie-poster?movieTitle=${encodeURIComponent(movieTitle)}&year=${encodeURIComponent(year || '')}`);
+    
+    if (response.posterUrl) {
+      // Preload the image
+      const img = new Image();
+      img.onload = () => {
+        posterImage.src = response.posterUrl;
+        posterImage.alt = `${movieTitle} Poster`;
+        posterImage.classList.remove('hidden');
+        posterLoader.classList.add('hidden');
+        posterFallback.style.opacity = '0';
+      };
+      img.onerror = () => {
+        // Image failed to load, show fallback
+        posterLoader.classList.add('hidden');
+        posterFallback.style.opacity = '1';
+      };
+      img.src = response.posterUrl;
+    } else {
+      // No poster available, show fallback
+      posterLoader.classList.add('hidden');
+      posterImage.classList.add('hidden');
+      posterFallback.style.opacity = '1';
+    }
+  } catch (error) {
+    console.error('Poster loading error:', error);
+    // On error, show fallback
+    posterLoader.classList.add('hidden');
+    posterImage.classList.add('hidden');
+    posterFallback.style.opacity = '1';
+  }
 }
 
 // Show Trailer
@@ -552,6 +600,9 @@ async function surpriseMe() {
     document.getElementById('movieTitle').textContent = `${movieData.title} (${movieData.year})`;
     document.getElementById('movieDesc').textContent = movieData.description;
     document.getElementById('movieWhy').textContent = movieData.reason;
+
+    // Load and display movie poster
+    await loadMoviePoster(movieData.title, movieData.year);
 
     // Show result section
     document.getElementById('result').classList.remove('hidden');

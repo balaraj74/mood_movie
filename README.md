@@ -6,6 +6,7 @@ MoodMatcher is a web app that analyzes your mood and recommends a movie based on
 
 -   **AI Mood Analysis**: Uses Groq's Llama-3.3 model to interpret your text input and identify key emotions like Happy, Sad, Anxious, and more.
 -   **Personalized Recommendations**: Get movie suggestions (Hollywood or Bollywood) tailored to your mood, complete with a description and a reason for the match.
+-   **Movie Posters**: Displays high-quality movie posters fetched from TMDB, with graceful fallback for movies without available posters.
 -   **"Surprise Me" Mode**: Feeling adventurous? Get a completely random and unexpected movie recommendation with a single click.
 -   **Voice Input**: Speak your mood directly into the app using your browser's built-in speech recognition capabilities.
 -   **User Authentication**: Secure sign-up and login with email/password or Google, powered by Firebase.
@@ -20,7 +21,7 @@ MoodMatcher is a web app that analyzes your mood and recommends a movie based on
 -   **Backend**: Node.js, Express.js
 -   **AI**: Groq API (`llama-3.3-70b-versatile` model)
 -   **Authentication**: Firebase Authentication
--   **APIs**: YouTube Data API
+-   **APIs**: YouTube Data API, TMDB (The Movie Database) API
 -   **Libraries**: Chart.js for data visualization
 
 ## Getting Started
@@ -53,6 +54,7 @@ Follow these instructions to get a copy of the project up and running on your lo
     -   Groq API
     -   Firebase (for authentication)
     -   YouTube Data API
+    -   TMDB API (for movie posters)
 
     ```dotenv
     # .env
@@ -66,6 +68,7 @@ Follow these instructions to get a copy of the project up and running on your lo
     # ... other Firebase variables from .env.example
     
     YOUTUBE_API_KEY=your_youtube_api_key_here
+    TMDB_API_KEY=your_tmdb_api_key_here
     
     PORT=3000
     ```
@@ -119,6 +122,7 @@ The backend server provides the following RESTful API endpoints, which are prote
 | `POST` | `/api/recommend-movie`      | Recommends a movie based on user text and mood.   |
 | `POST` | `/api/surprise-me`          | Recommends a completely random movie.             |
 | `GET`  | `/api/youtube-trailer`      | Fetches a YouTube trailer ID for a given title.   |
+| `GET`  | `/api/movie-poster`         | Fetches movie poster URL from TMDB API.           |
 | `POST` | `/api/save-history`         | Saves a user's mood and movie choice.             |
 | `GET`  | `/api/history`              | Retrieves a user's movie recommendation history.  |
 | `GET`  | `/api/health`               | Health check endpoint to confirm server is running. |
